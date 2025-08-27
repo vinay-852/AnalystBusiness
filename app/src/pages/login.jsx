@@ -24,7 +24,7 @@ const LoginPage = () => {
         }
       },
       {
-        scope: "public_profile,email,pages_show_list,instagram_basic,instagram_manage_insights,instagram_manage_comments",
+        scope: "email,pages_show_list,instagram_basic,instagram_manage_comments,instagram_manage_insights,instagram_manage_events,page_events,pages_manage_engagement,pages_manage_instant_articles,pages_manage_metadata,pages_manage_posts,pages_messaging_subscriptions,pages_read_engagement,pages_read_user_content,read_insights",
       }
     );
   };
