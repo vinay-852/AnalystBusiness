@@ -1,10 +1,94 @@
+import { useEffect, useState } from "react";
+import facebookInit from "../components/initialise";
 
-const dashboard = () => {
-    return (
-        <div>
-            "Get Data from facebook Pages"
-        </div>
+const Dashboard = () => {
+  const [pages, setPages] = useState([]);
+
+  useEffect(() => {
+    facebookInit();
+  }, []);
+
+  const getDetails = () => {
+    window.FB.api(
+      '/me/accounts',
+      'GET',
+      {
+        fields:
+          "fan_count,access_token,can_post,followers_count,name,engagement,rating_count,location,instagram_business_account,new_like_count,posts,general_info"
+      },
+      function (response) {
+        if (response && response.data) {
+          setPages(response.data);
+        } else {
+          setPages([]);
+        }
+      }
     );
+  };
+
+  useEffect(() => {
+    getDetails();
+  }, []);
+
+  return (
+    <div
+      style={{
+        fontFamily: "Lora, serif",
+        display: 'flex',
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'center',
+        minHeight: '100vh',
+        background: '#f3f4f6',
+        padding: '24px'
+      }}
+    >
+      {pages.length === 0 ? (
+        <div
+          style={{
+            textAlign: 'center',
+            border: '1px solid #ccc',
+            padding: '30px',
+            borderRadius: '8px',
+            maxWidth: '350px',
+            background: 'white',
+            boxShadow: '0 4px 16px rgba(0,0,0,0.07)'
+          }}
+        >
+          No Facebook Page Data Available
+        </div>
+      ) : (
+        pages.map((page, index) => (
+          <div
+            key={index}
+            style={{
+              textAlign: 'center',
+              border: '1px solid #ccc',
+              padding: '30px',
+              borderRadius: '8px',
+              maxWidth: '350px',
+              background: 'white',
+              boxShadow: '0 4px 16px rgba(0,0,0,0.07)'
+            }}
+          >
+            <h2 style={{ fontSize: '2rem', fontWeight: 700, marginBottom: '16px' }}>
+              {page.name || "N/A"}
+            </h2>
+            <p><strong>Fans:</strong> {page.fan_count ?? "N/A"}</p>
+            <p><strong>Followers:</strong> {page.followers_count ?? "N/A"}</p>
+            <p><strong>Can Post:</strong> {page.can_post ? "Yes" : "No"}</p>
+            <p><strong>Engagement:</strong> {page.engagement?.count ?? "N/A"}</p>
+            <p><strong>Rating Count:</strong> {page.rating_count ?? "N/A"}</p>
+            <p><strong>Location:</strong> {page.location?.city ?? "N/A"}</p>
+            <p><strong>Instagram Business Account:</strong> {page.instagram_business_account ? "Yes" : "No"}</p>
+            <p><strong>New Likes:</strong> {page.new_like_count ?? "N/A"}</p>
+            <p><strong>Total Posts:</strong> {page.posts?.data?.length ?? "N/A"}</p>
+            <p><strong>General Info:</strong> {page.general_info ?? "N/A"}</p>
+          </div>
+        ))
+      )}
+    </div>
+  );
 };
 
-export default dashboard;
+export default Dashboard;
