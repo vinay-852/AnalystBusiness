@@ -1,8 +1,11 @@
 import { useEffect, useState } from "react";
 import facebookInit from "../components/initialise";
-
+import { useNavigate } from "react-router-dom";
+import {useSelectedPage} from "../components/SelectedPageContext"
 const Dashboard = () => {
   const [pages, setPages] = useState([]);
+  const { setSelectedPage } = useSelectedPage();
+  const navigate = useNavigate();
 
   useEffect(() => {
     facebookInit();
@@ -29,6 +32,11 @@ const Dashboard = () => {
   useEffect(() => {
     getDetails();
   }, []);
+
+  const handleChoose = (page) => {
+    setSelectedPage(page);
+    navigate("/main");
+  };
 
   return (
     <div
@@ -62,13 +70,15 @@ const Dashboard = () => {
           <div
             key={index}
             style={{
-              textAlign: 'center',
               border: '1px solid #ccc',
               padding: '30px',
               borderRadius: '8px',
               maxWidth: '350px',
               background: 'white',
-              boxShadow: '0 4px 16px rgba(0,0,0,0.07)'
+              boxShadow: '0 4px 16px rgba(0,0,0,0.07)',
+              textAlign: 'left',
+              marginRight: '10px',
+              marginLeft: '10px'
             }}
           >
             <h2 style={{ fontSize: '2rem', fontWeight: 700, marginBottom: '16px' }}>
@@ -84,6 +94,12 @@ const Dashboard = () => {
             <p><strong>New Likes:</strong> {page.new_like_count ?? "N/A"}</p>
             <p><strong>Total Posts:</strong> {page.posts?.data?.length ?? "N/A"}</p>
             <p><strong>General Info:</strong> {page.general_info ?? "N/A"}</p>
+            <button
+              onClick={() => handleChoose(page)}
+              style={{ padding: '10px', border: 'none', borderRadius: '4px', backgroundColor: '#4267B2', color: 'white', cursor: 'pointer' }}
+            >
+              Choose
+            </button>
           </div>
         ))
       )}

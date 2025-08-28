@@ -4,13 +4,16 @@ import './index.css';
 import App from './App';
 import reportWebVitals from './reportWebVitals';
 import { AuthProvider } from './components/AuthContext';
+import { SelectedPageProvider } from './components/SelectedPageContext';
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
   <React.StrictMode>
     <AuthProvider>
+      <SelectedPageProvider>
         <App />
-      </AuthProvider>
+      </SelectedPageProvider>
+    </AuthProvider>
   </React.StrictMode>
 );
 

@@ -4,6 +4,7 @@ import LoginPage from './pages/login';
 import { BrowserRouter, Routes, Route, Link } from 'react-router-dom';
 import Dashboard from './pages/dashboard';
 import PrivateRoute from './components/PrivateRoute';
+import Main from './pages/main';
 
 function App() {
   return (
@@ -11,6 +12,7 @@ function App() {
            <Routes>
               <Route path="/login" element={<LoginPage />} />
               <Route path="/" element={<PrivateRoute><Dashboard /></PrivateRoute>} />
+              <Route path="/main" element={<PrivateRoute><Main /></PrivateRoute>} />
            </Routes>
    </BrowserRouter>
   );
