@@ -1,6 +1,9 @@
 import React from "react";
+import { useUserChoices } from "./UserChoicesContext";
 
-const Sidebar = ({ selectedPage, userChoices, onAddChoice }) => (
+const Sidebar = ({ selectedPage, onAddChoice }) => {
+  const { userChoices } = useUserChoices();
+  return (
   <aside
     style={{
       minWidth: "240px",
@@ -95,6 +98,7 @@ const Sidebar = ({ selectedPage, userChoices, onAddChoice }) => (
       <p>No page selected</p>
     )}
   </aside>
-);
+  );
+};
 
 export default Sidebar;

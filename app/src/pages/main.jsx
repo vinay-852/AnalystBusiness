@@ -1,6 +1,7 @@
 
 import { useSelectedPage } from "../components/SelectedPageContext";
-import { useState, useEffect } from "react";
+import { useState } from "react";
+import { useUserChoices } from "../components/UserChoicesContext";
 import Header from "../components/Header";
 import Sidebar from "../components/Sidebar";
 import MainContent from "../components/MainContent";
@@ -10,15 +11,7 @@ import GeminiModal from "../components/GeminiModal";
 const Main = () => {
 
   const { selectedPage } = useSelectedPage();
-  const [userChoices, setUserChoices] = useState(() => {
-    // Try to load from localStorage
-    try {
-      const saved = localStorage.getItem("artist_userChoices");
-      return saved ? JSON.parse(saved) : [];
-    } catch {
-      return [];
-    }
-  });
+  const { userChoices, setUserChoices } = useUserChoices();
   const [chatOpen, setChatOpen] = useState(false);
   const [modalOpen, setModalOpen] = useState(false);
 
@@ -40,21 +33,10 @@ const Main = () => {
 
   // Handle finish from GeminiModal
   const handleGeminiFinish = (summary) => {
-    setUserChoices((prev) => {
-      const updated = [...prev, summary];
-      try {
-        localStorage.setItem("artist_userChoices", JSON.stringify(updated));
-      } catch {}
-      return updated;
-    });
+    setUserChoices((prev) => [...prev, summary]);
   };
 
-  // Keep localStorage in sync if userChoices changes elsewhere
-  useEffect(() => {
-    try {
-      localStorage.setItem("artist_userChoices", JSON.stringify(userChoices));
-    } catch {}
-  }, [userChoices]);
+
 
   return (
     <div
@@ -69,7 +51,6 @@ const Main = () => {
       <section style={{ display: "flex", flex: 1, minHeight: 0 }}>
         <Sidebar
           selectedPage={selectedPage}
-          userChoices={userChoices}
           onAddChoice={handleAddChoice}
         />
         <div style={{ display: "flex", flex: 1, transition: "all 0.3s ease-in-out" }}>

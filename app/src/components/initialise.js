@@ -8,7 +8,7 @@ const facebookInit = () => {
 
     window.fbAsyncInit = function () {
       window.FB.init({
-        appId: "1683234035672865",
+        appId: process.env.REACT_APP_FACEBOOK_APP_ID,
         cookie: true,
         xfbml: true,
         version: "v23.0",

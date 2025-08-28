@@ -1,4 +1,5 @@
 import React from "react";
+import ArtisanAnalyst from "./ArtisanAnalyst";
 
 const MainContent = ({ selectedPage, chatOpen, onOpenChat }) => (
   <main
@@ -13,21 +14,7 @@ const MainContent = ({ selectedPage, chatOpen, onOpenChat }) => (
     }}
   >
     {selectedPage ? (
-      <div
-        style={{
-          flex: 1,
-          background: "#f5f5f5",
-          borderRadius: "12px",
-          boxShadow: "inset 0 2px 6px rgba(0,0,0,0.1)",
-          display: "flex",
-          justifyContent: "center",
-          alignItems: "center",
-          fontSize: "22px",
-          fontWeight: "bold",
-        }}
-      >
-        For Displaying Strategy
-      </div>
+      <ArtisanAnalyst selectedPage={selectedPage} style={{ flex: 1, width: '100%', height: '100%', margin: 0, padding: 0, borderRadius: 0, boxShadow: 'none', background: 'transparent' }} />
     ) : (
       <p>Please select a page on the Dashboard.</p>
     )}

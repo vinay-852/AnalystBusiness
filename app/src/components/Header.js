@@ -25,10 +25,21 @@ const Header = ({ onLogout }) => {
             gap: "12px",
           }}
         >
-          {["Dashboard", "Post Guidance"].map((item, i) => (
-            <li
-              key={i}
-              style={{
+          <li
+            style={{
+              cursor: "pointer",
+              padding: "8px 14px",
+              background: "white",
+              color: "black",
+              borderRadius: "8px",
+              boxShadow: "0 2px 4px rgba(0,0,0,0.1)",
+              transition: "all 0.2s",
+            }}
+          >
+            <a onClick={() => navigate("/post")}> "Post Guidance" </a>
+          </li>
+          <li
+            style={{
                 cursor: "pointer",
                 padding: "8px 14px",
                 background: "white",
@@ -37,12 +48,9 @@ const Header = ({ onLogout }) => {
                 boxShadow: "0 2px 4px rgba(0,0,0,0.1)",
                 transition: "all 0.2s",
               }}
-              onMouseOver={e => (e.currentTarget.style.background = "#f5f5f5")}
-              onMouseOut={e => (e.currentTarget.style.background = "white")}
             >
-              <a onClick={() => navigate("/")}>{item}</a>
+              <a onClick={() => navigate("/")}>"Dashboard"</a>
             </li>
-          ))}
         </ul>
       </nav>
       <button

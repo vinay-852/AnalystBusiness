@@ -5,13 +5,16 @@ import App from './App';
 import reportWebVitals from './reportWebVitals';
 import { AuthProvider } from './components/AuthContext';
 import { SelectedPageProvider } from './components/SelectedPageContext';
+import { UserChoicesProvider } from './components/UserChoicesContext';
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
   <React.StrictMode>
     <AuthProvider>
       <SelectedPageProvider>
-        <App />
+        <UserChoicesProvider>
+          <App />
+        </UserChoicesProvider>
       </SelectedPageProvider>
     </AuthProvider>
   </React.StrictMode>
