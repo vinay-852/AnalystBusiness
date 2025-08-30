@@ -56,14 +56,3 @@ This project includes the following assets located in the `assets/` folder:
 | ![withartistchoicesandsocialmediadetails](assets/withartistchoicesandsocialmediadetails.png) | Combined view: artist choices and social media details |
 
 ---
-
-This project includes the following assets located in the `assets/` folder:
-
-| Image | Description |
-|-------|-------------|
-| ![bussinessdetailsfromsocialmedia](assets/bussinessdetailsfromsocialmedia.png) | Business details extracted from social media |
-| ![facebooklogin](assets/facebooklogin.png) | Facebook login interface |
-| ![getartistchoices](assets/getartistchoices.png) | Artist choices selection screen |
-| ![strategybasedonsocialmediadata](assets/strategybasedonsocialmediadata.png) | Strategy based on social media data |
-| ![withartistchoicesandsocialmediadetails](assets/withartistchoicesandsocialmediadetails.png) | Combined view: artist choices and social media details |
-
