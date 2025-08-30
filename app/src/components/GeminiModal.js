@@ -5,111 +5,81 @@ const GeminiModal = ({ open, onClose, artistContext, onFinish }) => {
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
-  const [questionCount, setQuestionCount] = useState(0); // ✅ Track question count
+  const [questionCount, setQuestionCount] = useState(0);
   const chatEndRef = useRef(null);
   const chatSessionRef = useRef(null);
 
-  // Gemini client
   const genAI = new GoogleGenerativeAI(process.env.REACT_APP_GEMINI_API_KEY);
   const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
 
-  // Auto-scroll chat window
+  // Scroll to bottom
   useEffect(() => {
     chatEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
-  // Start conversation when modal opens
+  // Start session when modal opens
   useEffect(() => {
     if (open && artistContext) {
       const introPrompt = `
 You are an AI marketplace assistant for local artisans.
-Your goal is to ask simple, friendly questions in a conversational style to learn about the artisan, their craft, and their products.
-You will ask questions so you understand their preferences, needs, and challenges.
+Your job is to ask short, friendly questions (≤12 words).
+Ask **one question at a time**. Adapt your next question to the artisan’s answer.
+Ask between 5 and 10 valuable questions total, then say exactly: "finished".
 
-⚠️ Rules:
-
-Ask only short, clear questions (max 12 words).
-
-Ask one question at a time.
-
-Do not explain or give examples.
-
-Ask 8–10 questions total.
-
-After ~10 questions, say exactly: "finished".
-
-Context for this artisan:
-
+Context:
 Artist Page: ${artistContext.pageName}
-
 Followers: ${artistContext.followers}
-
 Likes: ${artistContext.likes}
-
 Recent Posts: ${artistContext.recentPosts.join(" | ")}
 
 Flow:
+1. Start with a warm opening about their products.
+2. Identity (who they are, location).
+3. Craft details (materials, techniques, products).
+4. Story/inspiration.
+5. Business side (pricing, sales, customers).
+6. Digital presence (social media, online goals).
+7. Future goals/challenges.
 
-Start with a warm opening question about their products.
-
-Continue with identity (who they are, location).
-
-Explore craft details (materials, techniques, product types).
-
-Ask about story/inspiration.
-
-Cover business side (pricing, sales, customers).
-
-Touch on digital presence (social media, online goals).
-
-End with future goals/challenges.
-
-Stop after ~10 questions with "finished".
+Stop after you have asked 5–10 valuable questions with "finished".
 `;
 
-      // Initialize chat session
       chatSessionRef.current = model.startChat({
         history: [
-          {
-            role: "user",
-            parts: [{ text: introPrompt }],
-          },
-        ],
+          { role: "user", parts: [{ text: introPrompt }] }
+        ]
       });
 
-      setMessages([{ sender: "bot", text: "⏳ Gemini is preparing..." }]);
-
-      // Kick off first message
+      // Kick off first question
       chatSessionRef.current
-        .sendMessage(introPrompt)
-        .then((resp) => {
-          handleBotReply(resp.response.text());
-        })
+        .sendMessage("Please ask your first question.")
+        .then((resp) => handleBotReply(resp.response.text()))
         .catch((err) => {
           console.error(err);
           setMessages([{ sender: "bot", text: "⚠️ Failed to start Gemini." }]);
         });
+
+      setMessages([{ sender: "bot", text: "⏳ Gemini is preparing..." }]);
     }
   }, [open, artistContext]);
 
-  // ✅ Handle bot replies (count + detect finished)
-  const handleBotReply = (botReply) => {
-    const clean = botReply.trim();
+  const handleBotReply = (reply) => {
+    let clean = reply.trim();
 
     if (clean.toLowerCase().includes("finished")) {
-      handleFinish(); // auto-finish when Gemini says "finished"
+      setMessages((prev) => [...prev, { sender: "bot", text: "finished" }]);
+      // auto-finish and generate JSON summary
+      handleFinish();
       return;
     }
 
     setMessages((prev) => [...prev, { sender: "bot", text: clean }]);
-
-    if (clean.endsWith("?")) {
-      setQuestionCount((prev) => prev + 1);
-    }
+    setQuestionCount((prev) => prev + 1);
   };
 
   const handleSend = async () => {
     if (!input.trim() || !chatSessionRef.current) return;
+
     const userMsg = { sender: "user", text: input };
     setMessages((prev) => [...prev, userMsg]);
     setInput("");
@@ -117,14 +87,14 @@ Stop after ~10 questions with "finished".
 
     try {
       const resp = await chatSessionRef.current.sendMessage(
-        `${input}\n\n(Remember: you have already asked ${questionCount} questions.)`
+        `${input}\n(Remember: you already asked ${questionCount} questions. Stop after 5–10 valuable questions with 'finished'.)`
       );
       handleBotReply(resp.response.text());
     } catch (err) {
       console.error(err);
       setMessages((prev) => [
         ...prev,
-        { sender: "bot", text: "⚠️ Error talking to Gemini." },
+        { sender: "bot", text: "⚠️ Error talking to Gemini." }
       ]);
     }
     setLoading(false);
@@ -132,7 +102,6 @@ Stop after ~10 questions with "finished".
 
   const handleKeyDown = (e) => e.key === "Enter" && handleSend();
 
-  // ✅ Structured JSON output
   const handleFinish = async () => {
     if (!chatSessionRef.current) return;
     setLoading(true);
@@ -142,14 +111,12 @@ Stop after ~10 questions with "finished".
       .join("\n");
 
     const summaryPrompt = `
-Analyze the following conversation and produce a JSON object.
-
+Analyze this conversation and output JSON.
 Rules:
-- Use key-value pairs only.
-- Keys should represent the main topics discussed.
-- Values should be concise summaries of what was said.
-- Include "total_questions" as a key with value ${questionCount}.
-- Only output pure JSON (no markdown, no explanations, no extra text).
+- Key-value pairs only.
+- Keys = topics, values = short summaries.
+- Include "total_questions": ${questionCount}.
+- Only output valid JSON.
 
 Conversation:
 ${convo}
@@ -157,11 +124,7 @@ ${convo}
 
     try {
       const resp = await chatSessionRef.current.sendMessage(summaryPrompt);
-      let jsonText = resp.response.text();
-
-      // Clean possible markdown wrapping
-      jsonText = jsonText.replace(/```json|```/g, "").trim();
-
+      let jsonText = resp.response.text().replace(/```json|```/g, "").trim();
       const parsed = JSON.parse(jsonText);
       onFinish(parsed);
       onClose();
@@ -182,7 +145,7 @@ ${convo}
         background: "rgba(0,0,0,0.7)",
         display: "flex",
         justifyContent: "center",
-        alignItems: "center",
+        alignItems: "center"
       }}
     >
       <div
@@ -195,15 +158,10 @@ ${convo}
           display: "flex",
           flexDirection: "column",
           position: "relative",
-          overflowY: "auto",
+          overflowY: "auto"
         }}
       >
-        <button
-          onClick={onClose}
-          style={{ position: "absolute", top: 10, right: 10 }}
-        >
-          ✕
-        </button>
+        <button onClick={onClose} style={{ position: "absolute", top: 10, right: 10 }}>✕</button>
         <h2>AI Marketplace Assistant</h2>
 
         <div
@@ -213,7 +171,7 @@ ${convo}
             border: "1px solid #ddd",
             padding: "10px",
             borderRadius: "8px",
-            marginBottom: "10px",
+            marginBottom: "10px"
           }}
         >
           {messages.map((msg, i) => (
@@ -221,7 +179,7 @@ ${convo}
               key={i}
               style={{
                 textAlign: msg.sender === "user" ? "right" : "left",
-                marginBottom: "8px",
+                marginBottom: "8px"
               }}
             >
               <span
@@ -230,7 +188,7 @@ ${convo}
                   padding: "8px 12px",
                   borderRadius: "12px",
                   background: msg.sender === "user" ? "#4267B2" : "#eee",
-                  color: msg.sender === "user" ? "white" : "black",
+                  color: msg.sender === "user" ? "white" : "black"
                 }}
               >
                 {msg.text}
@@ -247,21 +205,22 @@ ${convo}
             onChange={(e) => setInput(e.target.value)}
             onKeyDown={handleKeyDown}
             placeholder="Type your answer..."
+            disabled={messages.some((m) => m.text.toLowerCase() === "finished")}
             style={{
               flex: 1,
               padding: "8px",
               borderRadius: "6px",
-              border: "1px solid #ccc",
+              border: "1px solid #ccc"
             }}
           />
           <button
             onClick={handleSend}
-            disabled={loading}
+            disabled={loading || messages.some((m) => m.text.toLowerCase() === "finished")}
             style={{
               padding: "8px 14px",
               background: "#4267B2",
               color: "white",
-              borderRadius: "6px",
+              borderRadius: "6px"
             }}
           >
             Send
@@ -276,7 +235,7 @@ ${convo}
             padding: "8px 14px",
             background: "green",
             color: "white",
-            borderRadius: "6px",
+            borderRadius: "6px"
           }}
         >
           Finish & Save
