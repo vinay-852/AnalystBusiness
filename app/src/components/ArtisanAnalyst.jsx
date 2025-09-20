@@ -131,7 +131,7 @@ ${trends}
     };
 
     fetchAll();
-  }, [selectedPage, userChoices]);
+  }, [selectedPage, userChoices, fbStats, runGemini]);
 
   if (!selectedPage) return null;
 

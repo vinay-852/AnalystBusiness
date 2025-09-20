@@ -1,10 +1,11 @@
-import logo from './logo.svg';
 import './App.css';
 import LoginPage from './pages/login';
-import { BrowserRouter, Routes, Route, Link } from 'react-router-dom';
+import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import Dashboard from './pages/dashboard';
 import PrivateRoute from './components/PrivateRoute';
 import Main from './pages/main';
+
+import PostGuidance from './pages/PostGuidance';
 
 function App() {
   return (
@@ -13,6 +14,7 @@ function App() {
               <Route path="/login" element={<LoginPage />} />
               <Route path="/" element={<PrivateRoute><Dashboard /></PrivateRoute>} />
               <Route path="/main" element={<PrivateRoute><Main /></PrivateRoute>} />
+              <Route path="/post-guidance" element={<PrivateRoute><PostGuidance /></PrivateRoute>} />
            </Routes>
    </BrowserRouter>
   );

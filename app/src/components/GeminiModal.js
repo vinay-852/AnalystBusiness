@@ -17,6 +17,21 @@ const GeminiModal = ({ open, onClose, artistContext, onFinish }) => {
     chatEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
+  // Define handleBotReply before useEffect
+  const handleBotReply = (reply) => {
+    let clean = reply.trim();
+
+    if (clean.toLowerCase().includes("finished")) {
+      setMessages((prev) => [...prev, { sender: "bot", text: "finished" }]);
+      // auto-finish and generate JSON summary
+      handleFinish();
+      return;
+    }
+
+    setMessages((prev) => [...prev, { sender: "bot", text: clean }]);
+    setQuestionCount((prev) => prev + 1);
+  };
+
   // Start session when modal opens
   useEffect(() => {
     if (open && artistContext) {
@@ -61,21 +76,7 @@ Stop after you have asked 5–10 valuable questions with "finished".
 
       setMessages([{ sender: "bot", text: "⏳ Gemini is preparing..." }]);
     }
-  }, [open, artistContext]);
-
-  const handleBotReply = (reply) => {
-    let clean = reply.trim();
-
-    if (clean.toLowerCase().includes("finished")) {
-      setMessages((prev) => [...prev, { sender: "bot", text: "finished" }]);
-      // auto-finish and generate JSON summary
-      handleFinish();
-      return;
-    }
-
-    setMessages((prev) => [...prev, { sender: "bot", text: clean }]);
-    setQuestionCount((prev) => prev + 1);
-  };
+  }, [open, artistContext, handleBotReply, model]);
 
   const handleSend = async () => {
     if (!input.trim() || !chatSessionRef.current) return;

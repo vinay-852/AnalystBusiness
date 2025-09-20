@@ -1,8 +1,9 @@
 import React from "react";
-import { useNavigate } from "react-router";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 
 const Header = ({ onLogout }) => {
   const navigate = useNavigate();
+  const location = useLocation();
   return (
     <header
       style={{
@@ -36,7 +37,15 @@ const Header = ({ onLogout }) => {
               transition: "all 0.2s",
             }}
           >
-            <a onClick={() => navigate("/post")}> "Post Guidance" </a>
+            {location.pathname === "/post-guidance" ? (
+              <button onClick={() => navigate("/")} style={{ background: "none", border: "none", color: "inherit", cursor: "pointer", padding: 0 }}>
+                🏠 Home
+              </button>
+            ) : (
+              <button onClick={()=>{navigate("/post-guidance")}} style={{ background: "none", border: "none", color: "inherit", cursor: "pointer", padding: 0 }}>
+                  📊 Post Guidance
+              </button>
+            )}
           </li>
           <li
             style={{
@@ -49,7 +58,7 @@ const Header = ({ onLogout }) => {
                 transition: "all 0.2s",
               }}
             >
-              <a onClick={() => navigate("/")}>"Dashboard"</a>
+              <button onClick={() => navigate("/")} style={{ background: "none", border: "none", color: "inherit", cursor: "pointer", padding: 0 }}>Dashboard</button>
             </li>
         </ul>
       </nav>

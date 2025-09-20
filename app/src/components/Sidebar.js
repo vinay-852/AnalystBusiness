@@ -1,6 +1,8 @@
 import React from "react";
 import { useUserChoices } from "./UserChoicesContext";
 
+import { Link } from "react-router-dom";
+
 const Sidebar = ({ selectedPage, onAddChoice }) => {
   const { userChoices } = useUserChoices();
   return (

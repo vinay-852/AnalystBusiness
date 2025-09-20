@@ -5,20 +5,23 @@ import { useUserChoices } from "../components/UserChoicesContext";
 import Header from "../components/Header";
 import Sidebar from "../components/Sidebar";
 import MainContent from "../components/MainContent";
-import FloatingChatBox from "../components/FloatingChatBox";
+import Chatbot from "../components/Chatbot";
 import GeminiModal from "../components/GeminiModal";
 
 const Main = () => {
 
   const { selectedPage } = useSelectedPage();
-  const { userChoices, setUserChoices } = useUserChoices();
+  const { setUserChoices } = useUserChoices();
   const [chatOpen, setChatOpen] = useState(false);
   const [modalOpen, setModalOpen] = useState(false);
 
   const handleLogout = () => window.location.reload();
   const handleAddChoice = () => setModalOpen(true);
   const handleCloseModal = () => setModalOpen(false);
-  const handleOpenChat = () => setChatOpen(true);
+  const handleOpenChat = () => {
+    console.log('Chat button clicked, opening chatbot');
+    setChatOpen(true);
+  };
   const handleCloseChat = () => setChatOpen(false);
 
   // Prepare artistContext for GeminiModal
@@ -59,7 +62,7 @@ const Main = () => {
             chatOpen={chatOpen}
             onOpenChat={handleOpenChat}
           />
-          {chatOpen && <FloatingChatBox onClose={handleCloseChat} />}
+          {chatOpen && <Chatbot onClose={handleCloseChat} />}
         </div>
       </section>
       <GeminiModal
